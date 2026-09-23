@@ -1,7 +1,9 @@
 const { WebSocketServer } = require('ws');
 
-const wss = new WebSocketServer({ port: 8080 });
-console.log("Signaling server active on ws://127.0.0.1:8080");
+const PORT = process.env.PORT || 8080;
+
+const wss = new WebSocketServer({ port: PORT, host: '0.0.0.0' });
+console.log(`Signaling server active on port: ${PORT}`);
 
 const rooms = new Map();
 
