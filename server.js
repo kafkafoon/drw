@@ -68,6 +68,8 @@ wss.on('connection', async (ws) => {
 
     ws.on('message', (message) => {
         // --- FORCE STRING CONVERSION TO PREVENT SILENT DROPS ---
+	console.log("🔥 SERVER RECEIVED A MESSAGE");
+
         const messageString = message.toString('utf8'); 
         let data;
         try {
@@ -75,6 +77,8 @@ wss.on('connection', async (ws) => {
         } catch(e) {
             return;
         }
+
+	console.log("📨 Message type:", data.type);
 
         if (data.type === "create") {
             currentRoom = data.room;
