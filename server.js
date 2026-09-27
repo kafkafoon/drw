@@ -76,35 +76,6 @@ wss.on('connection', async (ws) => {
 
 
     // --------------------------------------------------------
-    // Send Xirsys configuration
-    // --------------------------------------------------------
-
-    try {
-
-        const iceServers = await getXirsysIceServers();
-
-        ws.send(JSON.stringify({
-            type: "ice_config",
-            iceServers: iceServers
-        }));
-
-        console.log("Sent Xirsys ICE configuration to client.");
-
-    } catch (error) {
-
-        console.error(
-            "Failed to get Xirsys ICE servers:",
-            error.message
-        );
-
-        ws.send(JSON.stringify({
-            type: "error",
-            message: "Failed to obtain TURN configuration."
-        }));
-    }
-
-
-    // --------------------------------------------------------
     // RECEIVE MESSAGES
     // --------------------------------------------------------
 
@@ -333,5 +304,35 @@ wss.on('connection', async (ws) => {
             error.message
         );
     });
+
+    // --------------------------------------------------------
+    // Send Xirsys configuration
+    // --------------------------------------------------------
+
+    try {
+
+        const iceServers = await getXirsysIceServers();
+
+        ws.send(JSON.stringify({
+            type: "ice_config",
+            iceServers: iceServers
+        }));
+
+        console.log("Sent Xirsys ICE configuration to client.");
+
+    } catch (error) {
+
+        console.error(
+            "Failed to get Xirsys ICE servers:",
+            error.message
+        );
+
+        ws.send(JSON.stringify({
+            type: "error",
+            message: "Failed to obtain TURN configuration."
+        }));
+    }
+
+
 
 });
