@@ -112,7 +112,7 @@ wss.on('connection', async (ws) => {
     	} else {
             console.log(`❌ Room full/invalid: ${currentRoom}`);
             ws.send(JSON.stringify({ type: "error", message: "Room full/invalid" }));
-        }
+        }}
 
         if (data.type === "webrtc_signal") {
             const room = rooms.get(currentRoom);
