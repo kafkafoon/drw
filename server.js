@@ -39,7 +39,7 @@ async function getXirsysIceServers() {
     return response.data.v.iceServers;
 }
 
-wss.on('connection', (ws) => {
+wss.on('connection', async (ws) => {
     let currentRoom = null;
     let isHost = false;
 	
