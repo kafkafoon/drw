@@ -12,6 +12,11 @@ async function getXirsysIceServers() {
     const ident = process.env.XIRSYS_IDENT;
     const secret = process.env.XIRSYS_SECRET;
     const channel = process.env.XIRSYS_CHANNEL;
+    
+    console.log("Xirsys configuration:");
+    console.log("IDENT exists:", !!ident);
+    console.log("SECRET exists:", !!secret);
+    console.log("CHANNEL:", channel);
 
     if (!ident || !secret || !channel) {
         throw new Error("Missing Xirsys environment variables");
@@ -20,7 +25,7 @@ async function getXirsysIceServers() {
     const auth = Buffer.from(`${ident}:${secret}`).toString('base64');
 
     const response = await axios.put(
-        `https://global.xirsys.net/_turn/${encodeURIComponent(channel)}`,
+        `https://global.xirsys.net/_turn/${encodeURIComponent(channel)}?webrtc=1`,
         {},
         {
             headers: {
