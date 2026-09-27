@@ -45,6 +45,7 @@ async function getXirsysIceServers() {
 }
 
 wss.on('connection', async (ws) => {
+    console.log("🔥🔥🔥 A CLIENT CONNECTED TO WEBSOCKET 🔥🔥🔥");
     let currentRoom = null;
     let isHost = false;
 	
