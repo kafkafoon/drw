@@ -1,4 +1,5 @@
 const { WebSocketServer } = require('ws');
+const axios = require('axios');
 
 const PORT = process.env.PORT || 8080;
 
@@ -7,9 +8,58 @@ console.log(`Signaling server active on port: ${PORT}`);
 
 const rooms = new Map();
 
+async function getXirsysIceServers() {
+    const ident = process.env.XIRSYS_IDENT;
+    const secret = process.env.XIRSYS_SECRET;
+    const channel = process.env.XIRSYS_CHANNEL;
+
+    if (!ident || !secret || !channel) {
+        throw new Error("Missing Xirsys environment variables");
+    }
+
+    const auth = Buffer.from(`${ident}:${secret}`).toString('base64');
+
+    const response = await axios.put(
+        `https://global.xirsys.net/_turn/${encodeURIComponent(channel)}`,
+        {},
+        {
+            headers: {
+                "Authorization": `Basic ${auth}`,
+                "Content-Type": "application/json"
+            }
+        }
+    );
+
+    if (!response.data || response.data.s !== "ok") {
+        throw new Error(
+            `Xirsys error: ${JSON.stringify(response.data)}`
+        );
+    }
+
+    return response.data.v.iceServers;
+}
+
 wss.on('connection', (ws) => {
     let currentRoom = null;
     let isHost = false;
+	
+    try {
+        const iceServers = await getXirsysIceServers();
+
+        ws.send(JSON.stringify({
+            type: "ice_config",
+            iceServers: iceServers
+        }));
+
+        console.log("Sent Xirsys ICE configuration to client.");
+    } catch (error) {
+        console.error("Failed to get Xirsys ICE servers:", error.message);
+
+        ws.send(JSON.stringify({
+            type: "error",
+            message: "Failed to obtain TURN configuration."
+        }));
+    }
 
     ws.on('message', (message) => {
         // --- FORCE STRING CONVERSION TO PREVENT SILENT DROPS ---
