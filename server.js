@@ -86,11 +86,31 @@ wss.on('connection', async (ws) => {
         if (data.type === "join") {
             currentRoom = data.room;
             const room = rooms.get(currentRoom);
+            console.log(`JOIN REQUEST -> Room: ${currentRoom}`);
+    	    console.log(`Rooms currently available:`, [...rooms.keys()]);
             if (room && !room.client) {
+                console.log(`✓ Lobby Joined -> ${currentRoom}`);
+        	console.log(`Host exists: ${!!room.host}`);
+      		console.log(`Client exists: ${!!room.client}`);
                 room.client = ws;
                 isHost = false;
                 console.log(`Lobby Joined -> ${currentRoom}`);
-                room.host.send(JSON.stringify({ type: "client_joined" }));
+                if (room.host) {
+           	    console.log(`→ Sending client_joined to host`);
+
+            	    const result = room.host.send(
+                    JSON.stringify({
+                    	type: "client_joined"
+                    })
+                    );
+
+            	    console.log(`→ client_joined send result:`, result);
+        	} else {
+            	    console.log(`❌ ERROR: Room has no host!`);
+        	}
+	
+    	} else {
+        console.log(`❌ Room full/invalid: ${currentRoom}`);
             } else {
                 ws.send(JSON.stringify({ type: "error", message: "Room full/invalid" }));
             }
