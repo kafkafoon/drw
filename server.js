@@ -311,7 +311,8 @@ wss.on('connection', async (ws) => {
 
     try {
 
-        const iceServers = await getXirsysIceServers();
+        const rawIceServers = await getXirsysIceServers();
+	const IceServers = filterIceServersForLibjuice(rawIceServers)
 
         ws.send(JSON.stringify({
             type: "ice_config",
@@ -336,3 +337,37 @@ wss.on('connection', async (ws) => {
 
 
 });
+
+function filterIceServersForLibjuice(iceServers) {
+    const filtered = [];
+
+    for (const server of iceServers) {
+        const urls = Array.isArray(server.urls)
+            ? server.urls
+            : [server.urls];
+
+        const supportedUrls = urls.filter(url => {
+            // STUN is supported
+            if (url.startsWith("stun:")) {
+                return true;
+            }
+
+            // Only allow TURN over UDP.
+            if (url.startsWith("turn:")) {
+                return !url.includes("transport=tcp");
+            }
+
+            // Reject TURN-over-TLS ("turns:")
+            return false;
+        });
+
+        if (supportedUrls.length > 0) {
+            filtered.push({
+                ...server,
+                urls: supportedUrls
+            });
+        }
+    }
+
+    return filtered;
+}
