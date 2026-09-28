@@ -312,7 +312,7 @@ wss.on('connection', async (ws) => {
     try {
 
         const rawIceServers = await getXirsysIceServers();
-	const IceServers = filterIceServersForLibjuice(rawIceServers)
+	const iceServers = filterIceServersForLibjuice(rawIceServers)
 
         ws.send(JSON.stringify({
             type: "ice_config",
